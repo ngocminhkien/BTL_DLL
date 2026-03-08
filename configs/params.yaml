@@ -1,0 +1,56 @@
+random_seed: 42
+
+paths:
+  raw_data: data/raw/data.csv
+  cleaned_data: data/processed/cleaned.csv
+  features_data: data/processed/features.parquet
+  basket_data: data/processed/basket.parquet
+  figures_dir: artifacts/figures
+  models_dir: artifacts/models
+  reports_dir: artifacts/reports
+
+preprocessing:
+  outlier:
+    quantity:
+      lower_quantile: 0.01
+      upper_quantile: 0.99
+    unit_price:
+      lower_quantile: 0.01
+      upper_quantile: 0.99
+  customer:
+    drop_missing_customerid: true
+
+rfm:
+  recency_snapshot: 2011-12-10
+
+association_rules:
+  min_support: 0.01
+  min_confidence: 0.3
+  min_lift: 1.1
+
+clustering:
+  n_clusters: 4
+
+modeling:
+  test_size: 0.2
+  smote: true
+  base_models:
+    logistic_regression:
+      C: 1.0
+      max_iter: 1000
+    random_forest:
+      n_estimators: 300
+      max_depth: 10
+  advanced_model:
+    xgboost:
+      n_estimators: 300
+      learning_rate: 0.1
+      max_depth: 6
+
+semi_supervised:
+  labeled_fraction: 0.2
+
+time_series:
+  forecast_periods: 6
+  arima_order: [1, 1, 1]
+

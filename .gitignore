@@ -1,0 +1,23 @@
+# Data - KHÔNG commit dữ liệu lớn 
+data/raw/
+data/processed/
+*.csv
+*.parquet
+
+# Python - File tạm và môi trường ảo
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Outputs - Chỉ giữ lại cấu trúc, không giữ file nặng
+outputs/models/*.pkl
+outputs/models/*.joblib
+
+# OS
+.DS_Store
+Thumbs.db

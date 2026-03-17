@@ -55,6 +55,7 @@ python -m pip install -r requirements.txt
 ```
 
 ### Bước 2: Chuẩn bị dữ liệu
+Tải bộ dữ liệu tại:https://www.kaggle.com/datasets/carrie1/ecommerce-data
 
 Đặt file `data.csv` vào:
 

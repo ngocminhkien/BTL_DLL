@@ -15,12 +15,12 @@ Project Bài tập lớn môn Khai phá dữ liệu (Data Mining) – Học kỳ
   - `evaluation.py`: Tính toán metric, vẽ biểu đồ, SHAP.
 - `notebooks/`: Các notebook `01_eda` đến `05_evaluation` gọi hàm từ `src/`.
 - `scripts/run_pipeline.py`: Chạy toàn bộ pipeline từ đầu đến cuối.
-- `artifacts/`: Lưu mô hình, hình vẽ, báo cáo.
+- `outputs/`: Nơi lưu **kết quả chạy pipeline** (figures, models, metrics).
 
 ## Cài đặt môi trường
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ## Chuẩn bị dữ liệu
@@ -37,5 +37,9 @@ data/raw/data.csv
 python scripts/run_pipeline.py
 ```
 
-Các kết quả chính (metric, hình vẽ, báo cáo) sẽ được lưu trong thư mục `artifacts/`.
+Các kết quả chính (metric, hình vẽ, model `.pkl`) sẽ được lưu trong thư mục `outputs/`:
+
+- `outputs/figures/`: biểu đồ (Confusion Matrix, …)
+- `outputs/models/`: model `.pkl` (có `best_model.pkl`)
+- `outputs/metrics/`: bảng metric `.csv` và báo cáo `.json`
 

@@ -10,3 +10,4 @@ statsmodels
 shap
 jupyter
 pyyaml
+pyarrow

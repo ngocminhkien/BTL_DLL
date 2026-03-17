@@ -17,6 +17,8 @@ venv/
 # Outputs - Chỉ giữ lại cấu trúc, không giữ file nặng
 outputs/models/*.pkl
 outputs/models/*.joblib
+outputs/metrics/
+outputs/figures/
 
 # OS
 .DS_Store

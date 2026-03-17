@@ -18,8 +18,8 @@ DATA_MINING_PROJECT/
 ├── configs/
 │   └── params.yaml                 # Tham số: seed, split, paths, hyperparams
 ├── data/
-│   ├── raw/                        # Dữ liệu gốc (không commit)
-│   └── processed/                  # Dữ liệu sau tiền xử lý (không commit)
+│   ├── raw/                        # Dữ liệu gốc
+│   └── processed/                  # Dữ liệu sau tiền xử lý
 ├── notebooks/                      # Notebook chạy theo thứ tự
 │   ├── 01_eda.ipynb
 │   ├── 02_preprocess_feature.ipynb

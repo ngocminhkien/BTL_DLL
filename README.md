@@ -1,45 +1,77 @@
 # Dự đoán trả hàng TMĐT với Online Retail
 
-Project Bài tập lớn môn Khai phá dữ liệu (Data Mining) – Học kỳ II, năm học 2025-2026.
+1. Giới thiệu dự án
+Dự án tập trung vào việc phân tích hành vi khách hàng và đặc điểm sản phẩm để dự đoán khả năng hoàn trả đơn hàng trong TMĐT. Quy trình thực hiện tuân theo pipeline: Nguồn dữ liệu -> Tiền xử lý -> Đặc trưng -> Mô hình hóa -> Đánh giá.
 
-## Cấu trúc thư mục
+2. Cấu trúc Repository 
 
-- `configs/params.yaml`: Cấu hình đường dẫn, random seed, hyperparameters.
-- `data/raw/`: Chứa file gốc `data.csv` (Online Retail).
-- `data/processed/`: Lưu dữ liệu sau tiền xử lý và đặc trưng.
-- `src/`: Các module Python chính
-  - `cleaner.py`: Tiền xử lý dữ liệu, tạo biến `is_return`.
-  - `features.py`: RFM, đặc trưng thời gian, vector hóa giỏ hàng.
-  - `mining.py`: Luật kết hợp, phân cụm.
-  - `models.py`: Mô hình phân lớp, bán giám sát, chuỗi thời gian.
-  - `evaluation.py`: Tính toán metric, vẽ biểu đồ, SHAP.
-- `notebooks/`: Các notebook `01_eda` đến `05_evaluation` gọi hàm từ `src/`.
-- `scripts/run_pipeline.py`: Chạy toàn bộ pipeline từ đầu đến cuối.
-- `outputs/`: Nơi lưu **kết quả chạy pipeline** (figures, models, metrics).
+Dự án được tổ chức theo cấu trúc module hóa chuyên nghiệp:
 
-## Cài đặt môi trường
+Plaintext
+DATA_MINING_PROJECT/
+├── configs/
+│   └── params.yaml          # Quản lý tham số: seed, split, paths, hyperparams [cite: 82, 149]
+├── data/
+│   ├── raw/                 # Dữ liệu gốc (không commit lên GitHub) [cite: 84, 151]
+│   └── processed/           # Dữ liệu sau tiền xử lý [cite: 85]
+├── notebooks/               # Chứa pipeline thực thi theo thứ tự [cite: 147]
+│   ├── 01_eda.ipynb
+│   ├── 02_preprocess_feature.ipynb
+│   ├── 03_mining_or_clustering.ipynb
+│   ├── 04_modeling.ipynb
+│   ├── 04b_semi_supervised.ipynb
+│   └── 05_evaluation_report.ipynb
+├── src/                     # Toàn bộ logic chính của dự án [cite: 96, 148]
+│   ├── data/                # Module loader, cleaner [cite: 98]
+│   ├── features/            # Module xây dựng đặc trưng (RFM, Bins) [cite: 102]
+│   ├── mining/              # Module luật kết hợp và phân cụm [cite: 109]
+│   ├── models/              # Module Supervised & Semi-supervised [cite: 115]
+│   └── evaluation/          # Module tính toán metrics & visualization [cite: 125]
+├── scripts/
+│   └── run_pipeline.py      # Script chạy toàn bộ pipeline tự động [cite: 134, 143]
+├── outputs/                 # Kết quả đầu ra của dự án [cite: 135]
+│   ├── figures/             # Các biểu đồ, hình ảnh báo cáo [cite: 136]
+│   ├── models/              # Các file mô hình đã huấn luyện (.pkl) 
+│   └── reports/             # Bảng biểu và kết quả tổng hợp [cite: 139]
+├── requirements.txt         # Danh sách thư viện cần thiết [cite: 79, 157]
+└── README.md
+3. Hướng dẫn cài đặt và thực thi (Reproducibility) 
 
-```bash
-python -m pip install -r requirements.txt
-```
+Bước 1: Cài đặt môi trường
+Đảm bảo bạn đã cài đặt Python 3.9+ và chạy lệnh sau để cài đặt thư viện:
 
-## Chuẩn bị dữ liệu
+Bash
+pip install -r requirements.txt [cite: 157]
+Bước 2: Chuẩn bị dữ liệu 
 
-Đặt file `data.csv` (Online Retail) vào thư mục:
+Tải bộ dữ liệu tại: Kaggle E-commerce Returns Dataset.
 
-```text
-data/raw/data.csv
-```
+Giải nén và đặt file data.csv vào thư mục data/raw/.
 
-## Chạy pipeline
+Bước 3: Cấu hình tham số
+Cập nhật các đường dẫn và tham số huấn luyện (nếu cần) tại file configs/params.yaml.
 
-```bash
-python scripts/run_pipeline.py
-```
+Bước 4: Chạy Pipeline 
 
-Các kết quả chính (metric, hình vẽ, model `.pkl`) sẽ được lưu trong thư mục `outputs/`:
+Bạn có thể chạy lần lượt các Notebook trong thư mục notebooks/ hoặc chạy script tự động để sinh ra toàn bộ Artifacts (kết quả):
 
-- `outputs/figures/`: biểu đồ (Confusion Matrix, …)
-- `outputs/models/`: model `.pkl` (có `best_model.pkl`)
-- `outputs/metrics/`: bảng metric `.csv` và báo cáo `.json`
+Bash
+python scripts/run_pipeline.py 
+4. Kết quả đạt được 
 
+Sau khi thực thi, các kết quả sau sẽ được tự động lưu vào thư mục outputs/:
+
+Figures: Biểu đồ phân phối, Learning Curve cho Semi-supervised, Confusion Matrix.
+
+
+Models: Mô hình tốt nhất đã được lưu dưới dạng .pkl.
+
+Reports: Bảng so sánh metric (F1, PR-AUC) giữa Baseline và XGBoost.
+
+5. Insight hành động (Actionable Insights)
+Dự án cung cấp ít nhất 5 kiến nghị cụ thể cho doanh nghiệp TMĐT nhằm giảm tỉ lệ trả hàng, bao gồm:
+
+Kiểm soát quy trình đóng gói nhóm sản phẩm có tỉ lệ trả hàng cao.
+
+Tối ưu hóa chính sách đổi trả tại các thị trường trọng điểm (như Ireland).
+... (Chi tiết xem tại notebooks/05_evaluation_report.ipynb)

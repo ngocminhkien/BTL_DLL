@@ -1,77 +1,96 @@
-# Dự đoán trả hàng TMĐT với Online Retail
+# Dự đoán trả hàng TMĐT (E-commerce Returns Prediction)
 
-1. Giới thiệu dự án
-Dự án tập trung vào việc phân tích hành vi khách hàng và đặc điểm sản phẩm để dự đoán khả năng hoàn trả đơn hàng trong TMĐT. Quy trình thực hiện tuân theo pipeline: Nguồn dữ liệu -> Tiền xử lý -> Đặc trưng -> Mô hình hóa -> Đánh giá.
+## 1) Giới thiệu dự án
 
-2. Cấu trúc Repository 
+Dự án tập trung vào việc phân tích hành vi khách hàng và đặc điểm sản phẩm để dự đoán khả năng hoàn trả đơn hàng trong TMĐT. Quy trình tuân theo pipeline:
 
-Dự án được tổ chức theo cấu trúc module hóa chuyên nghiệp:
+**Nguồn dữ liệu → Tiền xử lý → Đặc trưng → Mô hình hóa → Đánh giá**
 
-Plaintext
+Mục tiêu:
+
+- Dự đoán biến mục tiêu `is_return` (phân lớp).
+- Khai phá luật kết hợp và phân cụm khách hàng để rút ra insight hành động giúp giảm hoàn hàng.
+
+## 2) Cấu trúc Repository
+
+```text
 DATA_MINING_PROJECT/
 ├── configs/
-│   └── params.yaml          # Quản lý tham số: seed, split, paths, hyperparams [cite: 82, 149]
+│   └── params.yaml                 # Tham số: seed, split, paths, hyperparams
 ├── data/
-│   ├── raw/                 # Dữ liệu gốc (không commit lên GitHub) [cite: 84, 151]
-│   └── processed/           # Dữ liệu sau tiền xử lý [cite: 85]
-├── notebooks/               # Chứa pipeline thực thi theo thứ tự [cite: 147]
+│   ├── raw/                        # Dữ liệu gốc (không commit)
+│   └── processed/                  # Dữ liệu sau tiền xử lý (không commit)
+├── notebooks/                      # Notebook chạy theo thứ tự
 │   ├── 01_eda.ipynb
 │   ├── 02_preprocess_feature.ipynb
 │   ├── 03_mining_or_clustering.ipynb
 │   ├── 04_modeling.ipynb
 │   ├── 04b_semi_supervised.ipynb
-│   └── 05_evaluation_report.ipynb
-├── src/                     # Toàn bộ logic chính của dự án [cite: 96, 148]
-│   ├── data/                # Module loader, cleaner [cite: 98]
-│   ├── features/            # Module xây dựng đặc trưng (RFM, Bins) [cite: 102]
-│   ├── mining/              # Module luật kết hợp và phân cụm [cite: 109]
-│   ├── models/              # Module Supervised & Semi-supervised [cite: 115]
-│   └── evaluation/          # Module tính toán metrics & visualization [cite: 125]
+│   └── 05_evaluation.ipynb         # Evaluation + actionable insights + ARIMA forecast
+├── src/                            # Logic chính
+│   ├── data/                       # Loader/Cleaner
+│   ├── features/                   # Feature engineering (RFM, bins)
+│   ├── mining/                     # Association rules & clustering
+│   └── models/                     # Supervised & Semi-supervised
 ├── scripts/
-│   └── run_pipeline.py      # Script chạy toàn bộ pipeline tự động [cite: 134, 143]
-├── outputs/                 # Kết quả đầu ra của dự án [cite: 135]
-│   ├── figures/             # Các biểu đồ, hình ảnh báo cáo [cite: 136]
-│   ├── models/              # Các file mô hình đã huấn luyện (.pkl) 
-│   └── reports/             # Bảng biểu và kết quả tổng hợp [cite: 139]
-├── requirements.txt         # Danh sách thư viện cần thiết [cite: 79, 157]
+│   ├── run_pipeline.py             # Chạy pipeline tự động + chạy notebook 01→05
+│   └── normalize_notebook.py       # Chuẩn hóa notebook để chạy tái lập
+├── outputs/                        # Kết quả đầu ra (không commit)
+│   ├── figures/                    # Biểu đồ (Confusion Matrix, forecast, ...)
+│   ├── models/                     # Model đã huấn luyện (.pkl)
+│   ├── metrics/                    # Metrics + forecast (.csv/.json)
+│   └── notebooks/                  # Notebook đã execute (bản reproducible)
+├── requirements.txt                # Thư viện phụ thuộc
 └── README.md
-3. Hướng dẫn cài đặt và thực thi (Reproducibility) 
+```
 
-Bước 1: Cài đặt môi trường
-Đảm bảo bạn đã cài đặt Python 3.9+ và chạy lệnh sau để cài đặt thư viện:
+## 3) Hướng dẫn cài đặt và thực thi (Reproducibility)
 
-Bash
-pip install -r requirements.txt [cite: 157]
-Bước 2: Chuẩn bị dữ liệu 
+### Bước 1: Cài đặt môi trường
 
-Tải bộ dữ liệu tại: Kaggle E-commerce Returns Dataset.
+Yêu cầu: Python 3.9+.
 
-Giải nén và đặt file data.csv vào thư mục data/raw/.
+```bash
+python -m pip install -r requirements.txt
+```
 
-Bước 3: Cấu hình tham số
-Cập nhật các đường dẫn và tham số huấn luyện (nếu cần) tại file configs/params.yaml.
+### Bước 2: Chuẩn bị dữ liệu
 
-Bước 4: Chạy Pipeline 
+Đặt file `data.csv` vào:
 
-Bạn có thể chạy lần lượt các Notebook trong thư mục notebooks/ hoặc chạy script tự động để sinh ra toàn bộ Artifacts (kết quả):
+```text
+data/raw/data.csv
+```
 
-Bash
-python scripts/run_pipeline.py 
-4. Kết quả đạt được 
+### Bước 3: Cấu hình tham số
 
-Sau khi thực thi, các kết quả sau sẽ được tự động lưu vào thư mục outputs/:
+Chỉnh tham số tại `configs/params.yaml` (nếu cần).
 
-Figures: Biểu đồ phân phối, Learning Curve cho Semi-supervised, Confusion Matrix.
+### Bước 4: Chạy pipeline
 
+```bash
+python scripts/run_pipeline.py
+```
 
-Models: Mô hình tốt nhất đã được lưu dưới dạng .pkl.
+Script sẽ:
 
-Reports: Bảng so sánh metric (F1, PR-AUC) giữa Baseline và XGBoost.
+- Làm sạch dữ liệu + tạo features
+- Train model + lưu `.pkl`
+- Lưu metrics/figures vào `outputs/`
+- Chạy notebook 01→05 và lưu bản đã chạy vào `outputs/notebooks/`
 
-5. Insight hành động (Actionable Insights)
-Dự án cung cấp ít nhất 5 kiến nghị cụ thể cho doanh nghiệp TMĐT nhằm giảm tỉ lệ trả hàng, bao gồm:
+## 4) Kết quả đạt được
 
-Kiểm soát quy trình đóng gói nhóm sản phẩm có tỉ lệ trả hàng cao.
+Sau khi chạy, kết quả được lưu trong `outputs/`:
 
-Tối ưu hóa chính sách đổi trả tại các thị trường trọng điểm (như Ireland).
-... (Chi tiết xem tại notebooks/05_evaluation_report.ipynb)
+- **Figures**: phân phối, Confusion Matrix, learning curve (semi-supervised), ARIMA forecast.
+- **Models**: `best_model.pkl` và các model theo timestamp.
+- **Metrics/Reports**: bảng metric (F1, ROC-AUC, PR-AUC), JSON chi tiết, dự báo ARIMA theo tháng.
+
+## 5) Insight hành động (Actionable Insights)
+
+Chi tiết các insight kèm hành động nằm trong `notebooks/05_evaluation.ipynb`, ví dụ:
+
+- Kiểm soát quy trình đóng gói cho **Top sản phẩm có tỉ lệ trả cao** (xuất từ `outputs/metrics/top10_risky_products.csv`).
+- Tối ưu chính sách theo phân khúc khách hàng (VIP vs Return-prone).
+- Tuning threshold để giảm False Negative tùy mục tiêu kinh doanh.

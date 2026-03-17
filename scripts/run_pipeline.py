@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Dict, Tuple
 
 import sys
+import subprocess
+import shutil
 
 import joblib
 import numpy as np
@@ -40,6 +42,7 @@ class OutputPaths:
     figures: Path
     models: Path
     metrics: Path
+    notebooks: Path
 
 
 def load_config(config_path: Path) -> dict:
@@ -52,10 +55,49 @@ def ensure_outputs(project_root: Path) -> OutputPaths:
     figures = out_root / "figures"
     models = out_root / "models"
     metrics = out_root / "metrics"
+    notebooks = out_root / "notebooks"
     figures.mkdir(parents=True, exist_ok=True)
     models.mkdir(parents=True, exist_ok=True)
     metrics.mkdir(parents=True, exist_ok=True)
-    return OutputPaths(out_root, figures, models, metrics)
+    notebooks.mkdir(parents=True, exist_ok=True)
+    return OutputPaths(out_root, figures, models, metrics, notebooks)
+
+
+def strip_notebook_outputs(notebook_path: Path) -> None:
+    """Remove outputs/execution counts to avoid nbformat validation issues."""
+    import nbformat
+
+    nb = nbformat.read(notebook_path, as_version=4)
+    for cell in nb.get("cells", []):
+        if cell.get("cell_type") == "code":
+            cell["execution_count"] = None
+            cell["outputs"] = []
+    nbformat.write(nb, notebook_path)
+
+
+def execute_notebook(project_root: Path, notebook_path: Path, out_dir: Path) -> Path:
+    """Execute a notebook and write executed copy to outputs/notebooks/."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_name = notebook_path.name
+    out_path = out_dir / out_name
+
+    # Work on a copied notebook to avoid modifying the source notebook in repo
+    shutil.copy2(notebook_path, out_path)
+    strip_notebook_outputs(out_path)
+
+    cmd = [
+        sys.executable,
+        "-m",
+        "jupyter",
+        "nbconvert",
+        "--to",
+        "notebook",
+        "--execute",
+        "--inplace",
+        str(out_path),
+    ]
+    subprocess.run(cmd, cwd=str(project_root), check=True)
+    return out_path
 
 
 def build_invoice_level_features(clean_df: pd.DataFrame) -> pd.DataFrame:
@@ -271,6 +313,24 @@ def main() -> None:
     print("[DONE] Pipeline completed.")
     print("Best model:", best_name, "F1:", best_f1)
     print("Outputs saved to:", outputs.root)
+
+    # 6) Execute notebooks 01 -> 05 (and 04b if exists)
+    notebooks_to_run = [
+        project_root / "notebooks" / "01_eda.ipynb",
+        project_root / "notebooks" / "02_preprocess_feature.ipynb",
+        project_root / "notebooks" / "03_mining_or_clustering.ipynb",
+        project_root / "notebooks" / "04_modeling.ipynb",
+        project_root / "notebooks" / "04b_semi_supervised.ipynb",
+        project_root / "notebooks" / "05_evaluation.ipynb",
+    ]
+    existing = [p for p in notebooks_to_run if p.exists()]
+    print(f"[NOTEBOOKS] Executing {len(existing)} notebooks -> {outputs.notebooks}")
+    for nb in existing:
+        try:
+            out_nb = execute_notebook(project_root, nb, outputs.notebooks)
+            print("[OK] Executed:", nb.name, "->", out_nb)
+        except Exception as e:
+            print("[WARN] Notebook failed:", nb.name, "error:", e)
 
 
 if __name__ == "__main__":

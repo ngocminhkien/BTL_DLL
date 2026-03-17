@@ -11,3 +11,4 @@ shap
 jupyter
 pyyaml
 pyarrow
+nbformat

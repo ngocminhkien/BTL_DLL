@@ -19,6 +19,7 @@ outputs/models/*.pkl
 outputs/models/*.joblib
 outputs/metrics/
 outputs/figures/
+outputs/notebooks/
 
 # OS
 .DS_Store
